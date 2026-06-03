@@ -1,9 +1,9 @@
-name: 2. Prensa Shorts (Matrix EN)
+name: 2. Prensa Shorts (Matrix PL)
 
 on:
   schedule:
-    - cron: '30 15 * * *' # 11:30 ET
-    - cron: '30 16 * * *' # 12:30 ET
+    - cron: '30 11 * * *' # 13:30 Warsaw (winter) -> publica as 14:00
+    - cron: '30 12 * * *' # 14:30 Warsaw (winter) -> backup
   workflow_dispatch:
 
 jobs:
@@ -26,8 +26,8 @@ jobs:
           sudo apt-get install -y ffmpeg
       - run: pip install --upgrade google-api-python-client google-auth-oauthlib google-auth-httplib2 gspread pytz edge-tts
       - env:
-          GOOGLE_CREDENTIALS_EN: ${{ secrets.GOOGLE_CREDENTIALS_EN }}
-          YOUTUBE_TOKEN_EN_SHORTS: ${{ secrets.YOUTUBE_TOKEN_EN_SHORTS }}
+          GOOGLE_CREDENTIALS_PL: ${{ secrets.GOOGLE_CREDENTIALS_PL }}
+          YOUTUBE_TOKEN_PL_SHORTS: ${{ secrets.YOUTUBE_TOKEN_PL_SHORTS }}
           HORARIO_ALVO: ${{ matrix.horario }}
         run: python publicador_shorts.py
 
