@@ -11,7 +11,7 @@ from googleapiclient.discovery import build as build_drive
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 GOOGLE_JSON = os.environ.get("GOOGLE_CREDENTIALS_PL")
-YT_TOKEN_JSON = os.environ.get("YOUTUBE_TOKEN_PL")h
+YT_TOKEN_JSON = os.environ.get("YOUTUBE_TOKEN_PL")
 HORARIO_ALVO = os.environ.get("HORARIO_ALVO")
 
 print(f"Uruchamiam serwer dla: {HORARIO_ALVO}")
