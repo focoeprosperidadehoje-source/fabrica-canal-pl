@@ -31,7 +31,7 @@ os.makedirs(PASTA_TEMP, exist_ok=True)
 
 ID_PASTA_MARIA_VERT = "1QSUf1NYJbw8M_AOXiX50R_IZ8sPyXrHz"
 ID_PASTA_MUSICAS = "1gxZA1TlQPzuf737XOo_n8blfOThnddgm"
-ID_PLAYLIST_SHORTS_PL = "PLACEHOLDER_SHORTS_PL"
+ID_PLAYLIST_SHORTS_PL = "PLzILp3LgIBdwrAJvWggP7281NTClT4Ayl"
 
 def baixar_arquivo(file_id, destino):
     for tentativa in range(4):
