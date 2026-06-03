@@ -1,9 +1,9 @@
-name: 3. Comunidade e Vendas (EN)
+name: 3. Comunidade e Vendas (PL)
 
 on:
   schedule:
-    - cron: '30 11 * * *' # 07:30 ET
-    - cron: '30 23 * * *' # 19:30 ET
+    - cron: '30 6 * * *'  # 08:30 Warsaw (winter) / 07:30 (summer)
+    - cron: '30 16 * * *' # 18:30 Warsaw (winter) / 17:30 (summer)
   workflow_dispatch:
 
 jobs:
@@ -17,6 +17,6 @@ jobs:
       - run: pip install google-api-python-client google-auth-oauthlib google-auth-httplib2 gspread google-genai
       - env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GOOGLE_CREDENTIALS_EN: ${{ secrets.GOOGLE_CREDENTIALS_EN }}
-          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+          GOOGLE_CREDENTIALS_PL: ${{ secrets.GOOGLE_CREDENTIALS_PL }}
+          YOUTUBE_TOKEN_PL: ${{ secrets.YOUTUBE_TOKEN_PL }}
         run: python comunidade.py
