@@ -1,11 +1,11 @@
-name: 2. Prensa Longos (Matrix EN)
+name: 2. Prensa Longos (Matrix PL)
 
 on:
   schedule:
-    - cron: '30 8 * * *'  # 04:30 ET
-    - cron: '30 9 * * *'  # 05:30 ET
-    - cron: '30 20 * * *' # 16:30 ET
-    - cron: '30 21 * * *' # 17:30 ET
+    - cron: '30 3 * * *'  # 05:30 Warsaw (winter) -> publica as 06:00
+    - cron: '30 4 * * *'  # 06:30 Warsaw (winter) -> backup
+    - cron: '30 14 * * *' # 16:30 Warsaw (winter) -> publica as 18:00
+    - cron: '30 15 * * *' # 17:30 Warsaw (winter) -> backup
   workflow_dispatch:
 
 jobs:
@@ -30,8 +30,8 @@ jobs:
           wget -q -O Anton.ttf https://github.com/google/fonts/raw/main/ofl/anton/Anton-Regular.ttf
       - run: pip install --upgrade google-api-python-client google-auth-oauthlib google-auth-httplib2 Pillow gspread pytz edge-tts
       - env:
-          GOOGLE_CREDENTIALS_EN: ${{ secrets.GOOGLE_CREDENTIALS_EN }}
-          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+          GOOGLE_CREDENTIALS_PL: ${{ secrets.GOOGLE_CREDENTIALS_PL }}
+          YOUTUBE_TOKEN_PL: ${{ secrets.YOUTUBE_TOKEN_PL }}
           HORARIO_ALVO: ${{ matrix.horario }}
         run: python publicador.py
 
