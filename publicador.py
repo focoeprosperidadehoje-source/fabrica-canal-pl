@@ -11,7 +11,7 @@ from googleapiclient.discovery import build as build_drive
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 GOOGLE_JSON = os.environ.get("GOOGLE_CREDENTIALS_PL")
-YT_TOKEN_JSON = os.environ.get("YOUTUBE_TOKEN_PL")
+YT_TOKEN_JSON = os.environ.get("YOUTUBE_TOKEN_PL")h
 HORARIO_ALVO = os.environ.get("HORARIO_ALVO")
 
 print(f"Uruchamiam serwer dla: {HORARIO_ALVO}")
@@ -42,8 +42,8 @@ ID_PASTA_THUMB_JESUS_DIA = "1d1KcGUy895ccivgio9QxVbIzSdNeCTN5"
 ID_PASTA_THUMB_JESUS_NOITE = "1BFOWc6rNlhSpNAOatF2aWK7hEjPqMMzk"
 ID_PASTA_THUMB_MARIA = "1C04BHKkhGcxv1NRxxrmlDkmIdTO__S4k"
 
-ID_PLAYLIST_JESUS_MANHA = "PLACEHOLDER_MORNING_PL"
-ID_PLAYLIST_MARIA_NOITE = "PLACEHOLDER_EVENING_PL"
+ID_PLAYLIST_JESUS_MANHA = "PLzILp3LgIBdyHg4geVYK1pyRD_yPvF-g6"
+ID_PLAYLIST_MARIA_NOITE = "PLzILp3LgIBdxSGokCqi_va8t5_PiItsg1"
 
 def baixar_arquivo(file_id, destino):
     for tentativa in range(4):
