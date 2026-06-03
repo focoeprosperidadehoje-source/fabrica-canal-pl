@@ -1,10 +1,10 @@
-name: 1. Usina Longos (EN)
+name: 1. Usina Longos (PL)
 
 on:
   schedule:
-    - cron: '30 1 * * *' # 21:30 ET (prev day)
-    - cron: '30 2 * * *' # 22:30 ET (prev day)
-    - cron: '30 3 * * *' # 23:30 ET (prev day)
+    - cron: '30 0 * * *' # 02:30 Warsaw (winter) / 01:30 (summer)
+    - cron: '30 1 * * *' # 03:30 Warsaw (winter) / 02:30 (summer)
+    - cron: '30 2 * * *' # 04:30 Warsaw (winter) / 03:30 (summer)
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
       - run: pip install --upgrade google-genai gspread
       - env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GOOGLE_CREDENTIALS_EN: ${{ secrets.GOOGLE_CREDENTIALS_EN }}
+          GOOGLE_CREDENTIALS_PL: ${{ secrets.GOOGLE_CREDENTIALS_PL }}
         run: python usina.py
 
 # reindex
