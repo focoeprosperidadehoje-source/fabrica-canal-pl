@@ -1,8 +1,8 @@
-name: 1. Usina Shorts (EN)
+name: 1. Usina Shorts (PL)
 
 on:
   schedule:
-    - cron: '0 2 * * *' # 22:00 ET (prev day)
+    - cron: '0 1 * * *' # 03:00 Warsaw (winter) / 02:00 (summer)
   workflow_dispatch:
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - run: pip install google-genai gspread
       - env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GOOGLE_CREDENTIALS_EN: ${{ secrets.GOOGLE_CREDENTIALS_EN }}
+          GOOGLE_CREDENTIALS_PL: ${{ secrets.GOOGLE_CREDENTIALS_PL }}
         run: python usina_shorts.py
 
 # reindex
