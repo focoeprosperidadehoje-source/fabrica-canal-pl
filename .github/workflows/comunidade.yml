@@ -1,0 +1,22 @@
+name: 3. Comunidade e Vendas (EN)
+
+on:
+  schedule:
+    - cron: '30 11 * * *' # 07:30 ET
+    - cron: '30 23 * * *' # 19:30 ET
+  workflow_dispatch:
+
+jobs:
+  interagir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3'
+      - run: pip install google-api-python-client google-auth-oauthlib google-auth-httplib2 gspread google-genai
+      - env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_CREDENTIALS_EN: ${{ secrets.GOOGLE_CREDENTIALS_EN }}
+          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+        run: python comunidade.py

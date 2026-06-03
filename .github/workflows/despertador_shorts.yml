@@ -1,0 +1,22 @@
+name: 1. Usina Shorts (EN)
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # 22:00 ET (prev day)
+  workflow_dispatch:
+
+jobs:
+  produzir_shorts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3'
+      - run: pip install google-genai gspread
+      - env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_CREDENTIALS_EN: ${{ secrets.GOOGLE_CREDENTIALS_EN }}
+        run: python usina_shorts.py
+
+# reindex
