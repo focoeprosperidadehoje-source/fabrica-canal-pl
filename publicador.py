@@ -110,7 +110,7 @@ def criar_thumbnail(img_path, texto_curto, horario, persona, caminho_saida):
         img = img.crop((0, off, img.width, img.height - off))
     img = img.resize((1920, 1080)).convert("RGB")
     draw = ImageDraw.Draw(img)
-    cor_barra = "#DC143C" if "06:00" in horario else "#8B0000"
+    cor_barra = "#FFFFFF" if "06:00" in horario else "#DC143C"
     draw.rectangle([(0, 0), (120, 1080)], fill=cor_barra)
     texto = texto_curto.upper()
     font_size = 350
