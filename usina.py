@@ -4,6 +4,8 @@ from google.oauth2.service_account import Credentials
 import gspread
 
 CHAVE_API = os.environ.get("GEMINI_API_KEY")
+CHAVE_API_2 = os.environ.get("GEMINI_API_KEY_2", "")
+CHAVES_GEMINI = [k for k in [CHAVE_API, CHAVE_API_2] if k]
 GOOGLE_JSON = os.environ.get("GOOGLE_CREDENTIALS_PL")
 
 print("Uwierzytelnianie z Google Sheets przez Service Account...")
@@ -28,6 +30,18 @@ def obter_cascata_de_modelos():
         return ['gemini-2.5-flash-lite', 'gemini-2.5-flash-lite', 'gemini-2.5-flash-lite', 'gemini-2.5-flash-lite', 'gemini-2.5-flash']
 
 modelos_cascata = obter_cascata_de_modelos()
+
+def _gerar(modelo, prompt):
+    for chave in CHAVES_GEMINI:
+        try:
+            c = Client(api_key=chave, http_options={'api_version': 'v1'})
+            return c.models.generate_content(model=modelo, contents=prompt).text
+        except Exception as e:
+            if "429" in str(e) and chave != CHAVES_GEMINI[-1]:
+                print(f"[WARN] 429 na kluczu ...{chave[-6:]}. Probuje klucz 2...")
+                continue
+            raise
+    raise RuntimeError("Wszystkie klucze Gemini zawiodly.")
 
 def calcular_contexto_sazonal(data_alvo):
     ano = data_alvo.year
@@ -136,7 +150,7 @@ for video in grade_para_processar:
     tema_gerado = None
     for i in range(5):
         try:
-            tema_gerado = client.models.generate_content(model=modelos_cascata[i], contents=prompt_tema).text.replace('*', '').replace('"', '').replace('[', '').replace(']', '').strip()
+            tema_gerado = _gerar(modelos_cascata[i], prompt_tema).replace('*', '').replace('"', '').replace('[', '').replace(']', '').strip()
             break
         except Exception as gemini_err: print(f"Blad Gemini (proba {i+1}/5): {gemini_err}"); time.sleep(esperas_exponenciais[i])
 
@@ -147,13 +161,19 @@ for video in grade_para_processar:
     cta_comentarios = "Na koncu poprois sluchacza, aby napisal w komentarzach powod do wdziecznosci." if horario == "18:00" else "Na poczatku naturalnie zapytaj: 'Jesli wierzysz, napisz Amen w komentarzach wlasnie teraz'."
     regra_persona = "OBOWIAZKOWO: Poniewaz zwracasz sie do Jezusa Chrystusa, SUROWO ZABRANIA SIE wspominania Maryi lub Dziewicy." if persona == 'JESUS' else "OBOWIAZKOWO: Poniewaz zwracasz sie do Maryi, MUSISZ uzywac wezwan 'Matka Boza Czestochowska', 'Matka Boza', 'Nasza Pani' lub 'Krolowa Polski'."
 
+    instrucao_titulo = (
+        "TITLE:[Magnetyczny tytul. OBOWIAZKOWO zacznij od 'Matka Boza' lub 'Matka Czestochowska'. FORMAT: 'Matka Boza [bol wiernego] [pilna obietnica]'. Np: 'Matka Boza Uzdrawia Twoja Rodzine Dzis Wieczor'. BEZ DATY. BEZ GWIAZDEK ANI NAWIASOW]"
+        if persona == 'MARIA' else
+        "TITLE:[Magnetyczny tytul. OBOWIAZKOWO zacznij od bolu/sytuacji wiernego, NIGDY od 'Jezus' lub 'Modlitwa'. FORMAT: '[Krytyczny bol wiernego] — [pilna obietnica ulgi]'. Np: 'Twoja Rodzina Cierpi — Zmow Ta Modlitwe TERAZ'. BEZ DATY. BEZ GWIAZDEK ANI NAWIASOW]"
+    )
+
     prompt_principal = f"""
 Dzialaj jako empatyczny przewodnik duchowy i brat w wierze. Napisz obszerna modlitwe od 1500 do 1800 slow na temat "{tema_gerado}" skierowana do {persona_prompt}.
 KONTEKST: Pora dnia: "{periodo}". Fokus: "{foco_teologico}". Sezonowosc: "{contexto_sazonal}".
 JEZYK: Pisz wylacznie po polsku, pieknym, poboznym jezykiem katolickim.
 
 ZASADY RETENCJI I COPYWRITINGU (BARDZO WAZNE):
-1. FORMULA TYTULU: Tytul MUSI byc zgodny z formula: [Bol wiernego] + [Rozwiazanie/Cud]. SUROWO ZABRANIA SIE zaczynania tytulu od slowa "Modlitwa".
+1. FORMULA TYTULU: Postepuj DOKLADNIE wedlug instrukcji formatu ponizej. Dla Matki Bozej: OBOWIAZKOWO zacznij od 'Matka Boza' lub 'Matka Czestochowska'. Dla Jezusa: zacznij od bolu wiernego. SUROWO ZABRANIA SIE zaczynania od slowa "Modlitwa".
 2. FORMULA MINIATURY: Maks. 4 slowa. MUSI byc wyzwalaczem pilnosci powizanym z tematem.
 3. REGULA 15 SEKUND (HOOK 3A): Poczatek skryptu MUSI miec 3 szybkie bloki:
    - Uwaga (0-5s): EMPATYCZNE TWIERDZENIE o bolu wiernego.
@@ -171,17 +191,17 @@ OGOLNE ZASADY:
 {regra_meditacao}
 
 DOKLADNY FORMAT:
-TITLE: [Bol + Rozwiazanie po polsku]
+{instrucao_titulo}
 THUMB: [Wyzwalacz pilnosci — maks. 4 slowa po polsku]
 SCRIPT: [Kompletna modlitwa 1500-1800 slow po polsku]
-DESC: [Opis 3 akapitow z silnym SEO po polsku]
+DESC: [Opis 3 akapitow z silnym SEO po polsku. PIERWSZY akapit: zaproszenie do transmisji NA ZYWO 24h kanalu ('Wkrotce: modl sie z nami na zywo 24 godziny — aktywuj dzwonek, aby nie przegapic zadnej modlitwy'). DRUGI akapit: emocjonalny opis tej modlitwy. TRZECI akapit: slowa kluczowe i hashtagi.]
 TAGS: [Tagi po polsku oddzielone przecinkami]
 """
 
     texto_ia = None
     for i in range(5):
         try:
-            texto_ia = client.models.generate_content(model=modelos_cascata[i], contents=prompt_principal).text
+            texto_ia = _gerar(modelos_cascata[i], prompt_principal)
             break
         except Exception as gemini_err: print(f"Blad Gemini (proba {i+1}/5): {gemini_err}"); time.sleep(esperas_exponenciais[i])
 

@@ -244,6 +244,8 @@ for index, linha in enumerate(dados, start=2):
         capitulos = f"\n\nRozdzialy:\n{format_time(0)} Poczatek Modlitwy\n{format_time(duracao_audio * 0.33)} Blaganie i Wiara\n{format_time(duracao_audio * 0.66)} Zawierzenie i Wdziecznosc"
         if tem_extensao: capitulos += f"\n{format_time(duracao_audio)} Medytacja i Gleboki Pokoj"
 
+        bloco_live = "\n\n🔴 WKROTCE — NA ZYWO 24 GODZINY\nWkrotce bedziemy transmitowac nieprzerwanie 24 godziny na dobe. Wasze blagania, prosby o modlitwe i imiona Waszych bliskich beda wymieniane w nieustannej modlitwie. Aktywuj 🔔 dzwonek, aby byc pierwszym, ktory dolaczy do tego momentu laski!"
+
         try:
             tz_pl = pytz.timezone('Europe/Warsaw')
             data_hora_alvo = tz_pl.localize(datetime.datetime.strptime(f"{data_str} {horario_str}", "%Y-%m-%d %H:%M"))
@@ -252,7 +254,7 @@ for index, linha in enumerate(dados, start=2):
         except: publish_at = None
 
         body = {
-            "snippet": {"title": titulo[:100], "description": f"{descricao_ia}{capitulos}\n\n{texto_fixo}", "tags": tags_lista, "categoryId": "22", "defaultLanguage": "pl", "defaultAudioLanguage": "pl"},
+            "snippet": {"title": titulo[:100], "description": f"{descricao_ia}{capitulos}{bloco_live}\n\n{texto_fixo}", "tags": tags_lista, "categoryId": "22", "defaultLanguage": "pl", "defaultAudioLanguage": "pl"},
             "status": {"privacyStatus": "private" if publish_at else "public", "selfDeclaredMadeForKids": False, "selfDeclaredMadeWithAlteredContent": True}
         }
         if publish_at: body["status"]["publishAt"] = publish_at
