@@ -2,8 +2,10 @@ name: 2. Prensa Shorts (Matrix PL)
 
 on:
   schedule:
+    - cron: '30 3 * * *'  # 05:30 Warsaw (winter) -> publica as 06:00
+    - cron: '30 4 * * *'  # 06:30 Warsaw (winter) -> backup manhã
     - cron: '30 11 * * *' # 13:30 Warsaw (winter) -> publica as 14:00
-    - cron: '30 12 * * *' # 14:30 Warsaw (winter) -> backup
+    - cron: '30 12 * * *' # 14:30 Warsaw (winter) -> backup tarde
   workflow_dispatch:
 
 jobs:
@@ -15,6 +17,7 @@ jobs:
     strategy:
       matrix:
         horario:
+          - '06:00'
           - '14:00'
       fail-fast: false
 

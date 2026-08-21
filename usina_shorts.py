@@ -35,6 +35,7 @@ PILARES = {
     6: "Cuda i wdziecznosc"
 }
 GRADE_SHORTS = [
+    {"horario": "06:00", "personagem": "Maria", "idioma": "PL", "foco": "Ranek: Pod plaszczem Matki Bozej Czestochowskiej, zacznij dzien od cudu.", "ref": "18:00"},
     {"horario": "14:00", "personagem": "Maria", "idioma": "PL", "foco": "Poludnie: Wstawiennictwo, uzdrowienie i cuda.", "ref": "18:00"}
 ]
 
