@@ -1,0 +1,46 @@
+name: ⚙️ Setup .env PL (client_id/secret do YOUTUBE_TOKEN_PL)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    name: Extrair client_id/secret e atualizar .env no VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Configurar SSH para VPS
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY_VPS_PL }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/vps_key
+          chmod 600 ~/.ssh/vps_key
+          ssh-keyscan -H 169.58.220.233 >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Extrair client_id/secret e escrever no .env
+        env:
+          YOUTUBE_TOKEN_PL: ${{ secrets.YOUTUBE_TOKEN_PL }}
+        run: |
+          CLIENT_ID=$(echo "$YOUTUBE_TOKEN_PL" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('client_id',''))")
+          CLIENT_SECRET=$(echo "$YOUTUBE_TOKEN_PL" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('client_secret',''))")
+          if [ -z "$CLIENT_ID" ]; then
+            echo "ERRO: client_id não encontrado em YOUTUBE_TOKEN_PL"
+            exit 1
+          fi
+          echo "client_id encontrado: ${CLIENT_ID:0:8}..."
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 "
+            grep -q '^YT_CLIENT_ID=' /root/ao_vivo_pl/.env && \
+              sed -i 's|^YT_CLIENT_ID=.*|YT_CLIENT_ID=$CLIENT_ID|' /root/ao_vivo_pl/.env || \
+              echo 'YT_CLIENT_ID=$CLIENT_ID' >> /root/ao_vivo_pl/.env
+            grep -q '^YT_CLIENT_SECRET=' /root/ao_vivo_pl/.env && \
+              sed -i 's|^YT_CLIENT_SECRET=.*|YT_CLIENT_SECRET=$CLIENT_SECRET|' /root/ao_vivo_pl/.env || \
+              echo 'YT_CLIENT_SECRET=$CLIENT_SECRET' >> /root/ao_vivo_pl/.env
+            echo '✅ YT_CLIENT_ID e YT_CLIENT_SECRET adicionados em /root/ao_vivo_pl/.env'
+            grep '^YT_CLIENT_ID=' /root/ao_vivo_pl/.env | cut -c1-30
+          "
+
+      - name: Limpar chave SSH temporária
+        if: always()
+        run: rm -f ~/.ssh/vps_key
