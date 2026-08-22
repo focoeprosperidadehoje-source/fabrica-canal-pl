@@ -29,10 +29,15 @@ jobs:
             root@169.58.220.233:/root/ao_vivo_pl/gerar_token_pl.py
           echo "✅ gerar_token_pl.py copiado para /root/ao_vivo_pl/"
 
-      - name: Instalar google-auth-oauthlib no VPS
+      - name: Instalar dependências Python no VPS
         run: |
-          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 \
-            "pip3 install -q google-auth-oauthlib && echo '✅ google-auth-oauthlib instalado'"
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 "
+            apt-get install -y python3-pip -qq 2>/dev/null || true
+            python3 -m pip install -q --break-system-packages \
+              google-auth-oauthlib google-genai google-api-python-client \
+              google-auth pytz edge-tts python-dotenv pillow numpy \
+              && echo '✅ Dependências Python instaladas'
+          "
 
       - name: Limpar chave SSH temporária
         if: always()
