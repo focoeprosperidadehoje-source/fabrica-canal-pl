@@ -1,0 +1,39 @@
+name: 🔑 Deploy gerar_token_pl → VPS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Copiar script gerador de token PL para VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar SSH para VPS
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY_VPS_PL }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/vps_key
+          chmod 600 ~/.ssh/vps_key
+          ssh-keyscan -H 169.58.220.233 >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Copiar gerar_token_pl.py para VPS
+        run: |
+          scp -i ~/.ssh/vps_key -o StrictHostKeyChecking=no \
+            ao_vivo_pl/gerar_token_pl.py \
+            root@169.58.220.233:/root/ao_vivo_pl/gerar_token_pl.py
+          echo "✅ gerar_token_pl.py copiado para /root/ao_vivo_pl/"
+
+      - name: Instalar google-auth-oauthlib no VPS
+        run: |
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 \
+            "pip3 install -q google-auth-oauthlib && echo '✅ google-auth-oauthlib instalado'"
+
+      - name: Limpar chave SSH temporária
+        if: always()
+        run: rm -f ~/.ssh/vps_key
