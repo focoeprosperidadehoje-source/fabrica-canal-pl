@@ -1,4 +1,4 @@
-name: ⚙️ Setup Inicial VPS PL (one-time)
+﻿name: ⚙️ Setup Inicial VPS PL (one-time)
 
 on:
   workflow_dispatch:
@@ -20,35 +20,35 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/vps_key
           chmod 600 ~/.ssh/vps_key
-          ssh-keyscan -H 80.241.213.27 >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -H 169.58.220.233 >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Criar estrutura de diretórios no VPS
         run: |
-          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@80.241.213.27 \
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 \
             "mkdir -p /root/ao_vivo_pl/{blocos,suplicas,insumos_h,musicas/manha,musicas/noite,videos_base} && echo 'Diretórios PL criados.'"
 
       - name: Copiar script principal para VPS
         run: |
           scp -i ~/.ssh/vps_key -o StrictHostKeyChecking=no \
             ao_vivo_pl/ao_vivo_pl.py \
-            root@80.241.213.27:/root/ao_vivo_pl/ao_vivo_pl.py
+            root@169.58.220.233:/root/ao_vivo_pl/ao_vivo_pl.py
 
       - name: Instalar dependências Python no VPS
         run: |
-          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@80.241.213.27 \
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 \
             "pip3 install google-genai google-api-python-client google-auth pytz edge-tts python-dotenv pillow && echo 'Deps PL OK'"
 
       - name: Instalar service systemd
         run: |
           scp -i ~/.ssh/vps_key -o StrictHostKeyChecking=no \
             ao_vivo_pl/ao_vivo_pl.service \
-            root@80.241.213.27:/etc/systemd/system/ao_vivo_pl.service
-          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@80.241.213.27 \
+            root@169.58.220.233:/etc/systemd/system/ao_vivo_pl.service
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 \
             "systemctl daemon-reload && systemctl enable ao_vivo_pl && echo 'Service PL habilitado (NÃO iniciado — aguarda .env e OAuth)'"
 
       - name: Verificar estrutura criada
         run: |
-          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@80.241.213.27 \
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 \
             "ls -la /root/ao_vivo_pl/ && systemctl is-enabled ao_vivo_pl"
 
       - name: Limpar chave SSH temporária

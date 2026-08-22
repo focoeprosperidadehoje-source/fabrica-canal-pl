@@ -1,4 +1,4 @@
-name: 🚀 Deploy ao_vivo_pl → VPS
+﻿name: 🚀 Deploy ao_vivo_pl → VPS
 
 on:
   push:
@@ -29,12 +29,12 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/vps_key
           chmod 600 ~/.ssh/vps_key
-          ssh-keyscan -H 80.241.213.27 >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -H 169.58.220.233 >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Status do serviço (modo status)
         if: github.event.inputs.modo == 'status'
         run: |
-          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@80.241.213.27 \
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 \
             "systemctl status ao_vivo_pl --no-pager | head -20 && echo '---' && ls -lh /root/ao_vivo_pl/blocos/ | tail -5"
 
       - name: Deploy ao_vivo_pl.py
@@ -42,8 +42,8 @@ jobs:
         run: |
           scp -i ~/.ssh/vps_key -o StrictHostKeyChecking=no \
             ao_vivo_pl/ao_vivo_pl.py \
-            root@80.241.213.27:/root/ao_vivo_pl/ao_vivo_pl.py
-          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@80.241.213.27 \
+            root@169.58.220.233:/root/ao_vivo_pl/ao_vivo_pl.py
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 \
             "systemctl restart ao_vivo_pl && sleep 3 && systemctl is-active ao_vivo_pl && echo 'DEPLOY_OK'"
 
       - name: Limpar chave SSH temporária
