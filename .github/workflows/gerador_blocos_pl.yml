@@ -1,0 +1,59 @@
+name: 🎙️ Gerador de Áudio Live PL
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'  # 6×/dia a cada 4h UTC
+  workflow_dispatch:              # disparo manual
+
+jobs:
+  gerar_audio:
+    name: Gerar áudio PL (roteiro → TTS) → rsync VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar dependências Python
+        run: |
+          pip install --quiet \
+            google-genai \
+            google-api-python-client \
+            google-auth \
+            edge-tts \
+            pytz
+
+      - name: Gerar áudio PL (roteiro → TTS)
+        env:
+          GEMINI_KEY_LIVE_CONTENT_1_PL: ${{ secrets.GEMINI_KEY_LIVE_CONTENT_1_PL }}
+          GEMINI_KEY_LIVE_CONTENT_2_PL: ${{ secrets.GEMINI_KEY_LIVE_CONTENT_2_PL }}
+          YOUTUBE_TOKEN_PL:             ${{ secrets.YOUTUBE_TOKEN_PL }}
+        run: python3 ao_vivo_pl/gerar_bloco_live_pl.py
+
+      - name: Listar blocos PL gerados
+        run: |
+          echo "Blocos PL prontos para envio:"
+          ls -lh blocos_pl/ 2>/dev/null || echo "(nenhum)"
+
+      - name: Configurar SSH para VPS
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY_VPS_PL }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/vps_key
+          chmod 600 ~/.ssh/vps_key
+          ssh-keyscan -H 80.241.213.27 >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
+            root@80.241.213.27 "echo SSH_TEST_OK && hostname" || true
+
+      - name: Enviar blocos PL para VPS via rsync
+        run: |
+          rsync -avz --progress \
+            -e "ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no" \
+            blocos_pl/ \
+            root@80.241.213.27:/root/ao_vivo_pl/blocos/
+
+      - name: Remover chave SSH temporária
+        if: always()
+        run: rm -f ~/.ssh/vps_key

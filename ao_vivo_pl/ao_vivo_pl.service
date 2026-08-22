@@ -1,0 +1,15 @@
+[Unit]
+Description=Live 24/7 Canal PL — Matka Boża Częstochowska
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/ao_vivo_pl
+ExecStart=/usr/bin/python3 /root/ao_vivo_pl/ao_vivo_pl.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

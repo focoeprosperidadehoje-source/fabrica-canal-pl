@@ -1,0 +1,90 @@
+name: 🖼️ Gerador de Vídeos Base PL
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/gerador_videos_base_pl.yml'
+  schedule:
+    - cron: '0 5 * * 0'   # Domingos às 5h UTC (1h depois do ES para não sobrecarregar)
+  workflow_dispatch:
+    inputs:
+      num_videos:
+        description: 'Quantos vídeos criar (padrão: 8)'
+        required: false
+        default: '8'
+      drive_folder_id:
+        description: 'ID da pasta Drive (vazio = Częstochowa padrão)'
+        required: false
+        default: ''
+      video_prefix:
+        description: 'Prefixo do arquivo de saída'
+        required: false
+        default: 'czestochowa'
+
+jobs:
+  gerar_videos_base:
+    name: Criar slideshow blur-fill PL → rsync VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache FFmpeg
+        id: cache-ffmpeg
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/ffmpeg
+          key: ffmpeg-static-linux64-n7
+
+      - name: Instalar FFmpeg (static binary)
+        if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
+        run: |
+          wget -q -O /tmp/ffmpeg.tar.xz \
+            "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz"
+          tar -xf /tmp/ffmpeg.tar.xz --strip-components=2 -C /tmp --wildcards '*/bin/ffmpeg'
+          sudo mv /tmp/ffmpeg /usr/local/bin/ffmpeg
+          sudo chmod +x /usr/local/bin/ffmpeg
+
+      - name: Instalar dependências Python
+        run: |
+          pip install --quiet \
+            google-api-python-client \
+            google-auth \
+            pillow \
+            numpy
+
+      - name: Gerar vídeos base PL (blur-fill, santa centralizada)
+        env:
+          GOOGLE_CREDENTIALS_PL: ${{ secrets.GOOGLE_CREDENTIALS_PL }}
+          NUM_VIDEOS:      ${{ github.event.inputs.num_videos    || '8' }}
+          VIDEO_PREFIX:    ${{ github.event.inputs.video_prefix  || 'czestochowa' }}
+          DRIVE_FOLDER_ID: ${{ github.event.inputs.drive_folder_id || '' }}
+        run: python3 ao_vivo_pl/gerar_videos_base_pl.py
+
+      - name: Listar vídeos gerados
+        run: |
+          echo "Vídeos PL criados:"
+          ls -lh videos_base_pl/ 2>/dev/null || echo "(nenhum)"
+
+      - name: Configurar SSH para VPS
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY_VPS_PL }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/vps_key
+          chmod 600 ~/.ssh/vps_key
+          ssh-keyscan -H 80.241.213.27 >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Enviar vídeos para VPS (videos_base/)
+        run: |
+          rsync -avz --progress \
+            -e "ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no" \
+            videos_base_pl/ \
+            root@80.241.213.27:/root/ao_vivo_pl/videos_base/
+
+      - name: Limpar chave SSH temporária
+        if: always()
+        run: rm -f ~/.ssh/vps_key
