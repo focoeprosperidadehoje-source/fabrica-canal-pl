@@ -1,0 +1,36 @@
+name: 🔑 Deploy youtube_token.json PL → VPS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Escrever YOUTUBE_TOKEN_PL no VPS como youtube_token.json
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Configurar SSH para VPS
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY_VPS_PL }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/vps_key
+          chmod 600 ~/.ssh/vps_key
+          ssh-keyscan -H 169.58.220.233 >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Escrever youtube_token.json no VPS
+        env:
+          YOUTUBE_TOKEN_PL: ${{ secrets.YOUTUBE_TOKEN_PL }}
+        run: |
+          echo "$YOUTUBE_TOKEN_PL" | ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 \
+            "cat > /root/ao_vivo_pl/youtube_token.json && chmod 600 /root/ao_vivo_pl/youtube_token.json && echo '✅ youtube_token.json PL escrito'"
+
+      - name: Verificar token
+        run: |
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 \
+            "python3 -c \"import json; d=json.load(open('/root/ao_vivo_pl/youtube_token.json')); print('client_id:', d.get('client_id','?')[:20]+'...'); print('has refresh_token:', bool(d.get('refresh_token')))\""
+
+      - name: Limpar chave SSH temporária
+        if: always()
+        run: rm -f ~/.ssh/vps_key
