@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/root/ao_vivo_pl
-ExecStart=/usr/bin/python3 /root/ao_vivo_pl/ao_vivo_pl.py
+ExecStart=/root/venv_pl/bin/python3 /root/ao_vivo_pl/ao_vivo_pl.py
 Restart=always
 RestartSec=10
 StandardOutput=journal
