@@ -61,7 +61,7 @@ jobs:
           GOOGLE_CREDENTIALS_PL: ${{ secrets.GOOGLE_CREDENTIALS_PL }}
           NUM_VIDEOS:      ${{ github.event.inputs.num_videos    || '8' }}
           VIDEO_PREFIX:    ${{ github.event.inputs.video_prefix  || 'czestochowa' }}
-          DRIVE_FOLDER_ID: ${{ github.event.inputs.drive_folder_id || '' }}
+          DRIVE_FOLDER_ID: ${{ github.event.inputs.drive_folder_id || '1wJNJ0BB4qct2kMeph0Sb5Ytftj2HgibM' }}
         run: python3 ao_vivo_pl/gerar_videos_base_pl.py
 
       - name: Listar vídeos gerados
