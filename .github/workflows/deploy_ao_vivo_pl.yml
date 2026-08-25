@@ -1,15 +1,10 @@
 name: 🚀 Deploy ao_vivo_pl → VPS
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'ao_vivo_pl/ao_vivo_pl.py'
-      - 'ao_vivo_pl/ao_vivo_pl.service'
   workflow_dispatch:
     inputs:
       modo:
-        description: 'Modo: deploy | status'
+        description: 'Modo: deploy | status | rebuild_deps | cleanup_blocos | log'
         required: false
         default: 'deploy'
 
@@ -37,15 +32,53 @@ jobs:
         run: |
           ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 "
             systemctl is-active ao_vivo_pl
-            systemctl status ao_vivo_pl --no-pager | head -10
+            systemctl status ao_vivo_pl --no-pager | head -12
             echo '--- FFMPEG SPEED ---'
             tail -c 2000 /root/ao_vivo_pl/ffmpeg_h.log 2>/dev/null | tr '\r' '\n' | grep -E 'speed=|fps=' | sed 's/speed= */speed=/g' | tail -5 || echo 'sem dados'
             echo '--- BLOCOS ---'
-            ls -lh /root/ao_vivo_pl/blocos/ 2>/dev/null | tail -5
+            ls /root/ao_vivo_pl/blocos/*.mp4 2>/dev/null | wc -l || echo '0 blocos'
+            echo '--- CPU LOAD ---'
+            top -bn1 | head -5
+            echo '--- DISCO ---'
+            df -h /root 2>/dev/null | tail -2
           "
 
-      - name: Ensure venv_pl e instalar dependências Python
-        if: github.event.inputs.modo != 'status'
+      - name: Log recente PL (modo log)
+        if: github.event.inputs.modo == 'log'
+        run: |
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 "
+            echo '=== AO VIVO PL LOG (últimas 60 linhas) ===';
+            journalctl -u ao_vivo_pl -n 60 --no-pager || echo 'sem log';
+          "
+
+      - name: Limpeza de blocos defeituosos (modo cleanup_blocos)
+        if: github.event.inputs.modo == 'cleanup_blocos'
+        run: |
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 "
+            echo '--- ANTES ---'
+            ls /root/ao_vivo_pl/blocos/*.mp4 2>/dev/null | wc -l || echo '0 blocos'
+            ls /root/ao_vivo_pl/videos_base/ 2>/dev/null || echo 'sem videos_base'
+            echo '--- MANTENDO OS 3 MAIS NOVOS, REMOVENDO OS DEMAIS ---'
+            cd /root/ao_vivo_pl/blocos && \
+            TOTAL=\$(ls bloco_*_h.mp4 2>/dev/null | wc -l) && \
+            echo \"Total: \$TOTAL blocos\" && \
+            if [ \"\$TOTAL\" -gt 3 ]; then
+              ls -t bloco_*_h.mp4 | tail -n +4 | xargs rm -v
+              echo 'Blocos antigos removidos.'
+            else
+              echo 'Menos de 4 blocos — nada removido.'
+            fi
+            echo '--- REINICIANDO ao_vivo_pl ---'
+            systemctl restart ao_vivo_pl
+            sleep 10
+            systemctl is-active ao_vivo_pl
+            echo '--- APÓS ---'
+            ls /root/ao_vivo_pl/blocos/*.mp4 2>/dev/null | wc -l || echo '0 blocos'
+            journalctl -u ao_vivo_pl -n 15 --no-pager
+          "
+
+      - name: Rebuild venv_pl (modo rebuild_deps apenas)
+        if: github.event.inputs.modo == 'rebuild_deps'
         run: |
           ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 bash << 'ENDSSH'
             set -e
@@ -53,30 +86,25 @@ jobs:
             if ! dpkg -l python3.12-venv 2>/dev/null | grep -q "^ii"; then
               for i in 1 2 3 4 5; do
                 apt-get update -qq && apt-get install -y python3.12-venv python3-pip -qq 2>/dev/null && break
-                echo "apt tentativa $i falhou, aguardando 15s..."
                 sleep 15
               done
             fi
             systemctl stop ao_vivo_pl || true
+            sleep 5
+            kill -9 $(pgrep -f ao_vivo_pl) 2>/dev/null || true
+            sleep 2
             rm -rf /root/venv_pl
             python3 -m venv /root/venv_pl
-            echo "✅ venv_pl recriado"
             /root/venv_pl/bin/pip install --upgrade pip --quiet
             /root/venv_pl/bin/pip install --quiet \
-              google-genai \
-              google-api-python-client \
-              google-auth \
-              google-auth-oauthlib \
-              pytz \
-              edge-tts \
-              pillow \
-              numpy
-            echo "✅ Dependências instaladas no venv_pl"
+              google-genai google-api-python-client google-auth google-auth-oauthlib \
+              pytz edge-tts pillow numpy
             /root/venv_pl/bin/python3 -c "from google import genai; print('✅ google-genai OK')"
+            echo "✅ venv_pl recriado com dependências"
           ENDSSH
 
       - name: Deploy ao_vivo_pl.py e service file
-        if: github.event.inputs.modo != 'status'
+        if: github.event.inputs.modo == 'deploy' || github.event.inputs.modo == 'rebuild_deps'
         run: |
           scp -i ~/.ssh/vps_key -o StrictHostKeyChecking=no \
             ao_vivo_pl/ao_vivo_pl.py \
@@ -86,7 +114,7 @@ jobs:
             root@169.58.220.233:/etc/systemd/system/ao_vivo_pl.service
 
       - name: Reiniciar serviço
-        if: github.event.inputs.modo != 'status'
+        if: github.event.inputs.modo == 'deploy' || github.event.inputs.modo == 'rebuild_deps'
         run: |
           ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=no root@169.58.220.233 "
             systemctl daemon-reload
