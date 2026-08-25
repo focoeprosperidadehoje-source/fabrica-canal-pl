@@ -1205,7 +1205,7 @@ def loop_transmissor():
             ciclo_start     = time.time()
             ultimo_check_bc = time.time()
             ultimo_suplica  = ciclo_start - (SUPLICA_INTERVAL - 5 * 60)
-            ultimo_refresh_rtmp = ciclo_start  # PL: dispara às 4h exatas (EN dispara 3.5h → sempre offset 30min entre eles)
+            ultimo_refresh_rtmp = ciclo_start  # PL: dispara às 12h exatas (EN dispara 11.5h → sempre offset 30min entre eles)
 
             try:
                 while not _ev_parar.is_set():
@@ -1225,7 +1225,7 @@ def loop_transmissor():
                         proc_h = _iniciar_proc_playlist(playlist_h, STREAM_KEY_H, "H")
 
                     # Refresh periódico RTMP a cada 2h: previne degradação de sinal pelo YouTube
-                    if (time.time() - ultimo_refresh_rtmp) >= 2 * 3600:
+                    if (time.time() - ultimo_refresh_rtmp) >= 12 * 3600:
                         log.info("Refresh RTMP periódico PL: reiniciando FFmpeg H para manter sinal Excelente")
                         _matar_proc(proc_h, "H")
                         time.sleep(2)  # aguarda YouTube registrar desconexão antes de reconectar
