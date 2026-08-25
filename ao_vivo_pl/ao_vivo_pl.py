@@ -1372,21 +1372,28 @@ def _eh_mensagem_respondivel_pl(texto: str) -> bool:
     return True
 
 def _gerar_resposta_chat_pl(autor: str, texto: str) -> str | None:
-    chaves = _CHAT_GEMINI_KEYS_PL
+    chaves = CHAVES_CHAT
     if not chaves:
         return None
     t = texto.lower()
     if any(p in t for p in ["jestem jedyną", "jestem jedynym", "sama tutaj",
-                              "sam tutaj", "nikt inny"]):
+                              "sam tutaj", "nikt inny", "nikt nie ogląda"]):
         return ("Nie jesteś sama/sam! 🙏 Matka Boża Częstochowska błogosławi każdego, "
                 "kto dołącza do naszej modlitwy. Podziel się tym błogosławieństwem! ❤️")
+    if any(p in t for p in ["pokaż twarz", "pokaż kamerę", "bez kamery",
+                              "gdzie kamera", "włącz kamerę"]):
+        return ("To jest misja cichej modlitwy 🙏 Obecność Matki Bożej czuje się w sercu. "
+                "Cieszymy się, że jesteś z nami!")
     prompt = (
-        f"Jesteś kanałem modlitewnym Matki Bożej Częstochowskiej, odpowiadającym na czacie na żywo 24/7.\n\n"
-        f"Wierny @{autor} napisał: \"{texto}\"\n\n"
-        f"Odpowiedz po polsku 1 krótkim zdaniem (maks. 180 znaków): "
-        f"ciepłym, pobożnym, gościnnym. Wspomnij Matkę Bożą Częstochowską jeśli to naturalne. "
-        f"Jeśli to prośba o modlitwę, potwierdź że zostanie złożona. "
-        f"Bez markdown, gwiazdek ani hashtagów."
+        f"Jesteś duchowym towarzyszem kanału modlitewnego Matki Bożej Częstochowskiej. "
+        f"Nie jesteś świętą — jesteś kochającym członkiem zespołu modlitewnego.\n\n"
+        f"Wierny @{autor} napisał na czacie na żywo: \"{texto}\"\n\n"
+        f"Odpowiedz po POLSKU, maks. 2 linijki (maks. 180 znaków łącznie). "
+        f"TRYB POJEDNAWCZY jeśli wiadomość jest negatywna lub krytyczna: odpowiedz z miłością, szanuj jego pogląd, "
+        f"skieruj ku pokojowi Bożemu. Nigdy nie wdawaj się w kłótnię. "
+        f"Jeśli wspomina ból lub cierpienie: pociesz i zaproś do pozostawienia próśb w strumieniu modlitwy 24h. "
+        f"Jeśli prosi o modlitwę za kogoś: potwierdź że zostanie złożona. "
+        f"Ton: ciepły, gościnny, pełen nadziei. Bez markdown, gwiazdek ani hashtagów."
     )
     for chave in chaves:
         try:
@@ -1442,6 +1449,8 @@ def loop_respostas_chat():
                 if msg_id in ids_vistos:
                     continue
                 ids_vistos.add(msg_id)
+                if item["authorDetails"].get("isChatOwner", False):
+                    continue
                 if respondeu:
                     continue
                 texto = item["snippet"].get("displayMessage", "").strip()
