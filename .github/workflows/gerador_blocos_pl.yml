@@ -2,7 +2,7 @@
 
 on:
   schedule:
-    - cron: '0 */4 * * *'  # 6×/dia a cada 4h UTC
+    - cron: '0 3,7,11,15,19,23 * * *'  # 6×/dia — offset 2h após EN (1/5/9/13/17/21h) evita overlap no VPS2
   workflow_dispatch:              # disparo manual
 
 jobs:

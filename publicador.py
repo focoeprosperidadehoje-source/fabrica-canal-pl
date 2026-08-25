@@ -311,7 +311,7 @@ for index, linha in enumerate(dados, start=2):
         capitulos = f"\n\nRozdzialy:\n{format_time(0)} Poczatek Modlitwy\n{format_time(duracao_audio * 0.33)} Blaganie i Wiara\n{format_time(duracao_audio * 0.66)} Zawierzenie i Wdziecznosc"
         if tem_extensao: capitulos += f"\n{format_time(duracao_audio)} Medytacja i Gleboki Pokoj"
 
-        bloco_live = "\n\n🔴 WKROTCE — NA ZYWO 24 GODZINY\nWkrotce bedziemy transmitowac nieprzerwanie 24 godziny na dobe. Wasze blagania, prosby o modlitwe i imiona Waszych bliskich beda wymieniane w nieustannej modlitwie. Aktywuj 🔔 dzwonek, aby byc pierwszym, ktory dolaczy do tego momentu laski!"
+        bloco_live = "\n\n🔴 TERAZ NA ŻYWO — 24 GODZINY Z MATKĄ BOŻĄ\nTransmitujemy nieprzerwanie 24 godziny na dobę. Wasze błagania, prośby o modlitwę i imiona Waszych bliskich są wymieniane w nieustannej modlitwie. Dołącz teraz! 👉 https://youtube.com/channel/UCEIh4A01a8tBI1XWp-p6Kkw/live"
 
         try:
             tz_pl = pytz.timezone('Europe/Warsaw')
