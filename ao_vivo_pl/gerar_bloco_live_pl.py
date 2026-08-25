@@ -335,7 +335,7 @@ ZASADY BEZWZGLĘDNE:
 - Od 2600 do 3000 słów
 """
 
-    modelos = ["gemini-2.5-flash"] if so_full else MODELOS_FULL
+    modelos = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"] if so_full else MODELOS_FULL
     texto   = _chamar_gemini(prompt, modelos, max_tokens=8192)
     texto   = re.sub(r'\*+', '', texto)
     texto   = re.sub(r'#{1,6}\s+', '', texto)
