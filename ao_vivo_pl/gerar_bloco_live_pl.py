@@ -42,8 +42,8 @@ CANAL_ID   = "UCEIh4A01a8tBI1XWp-p6Kkw"
 DIR_BLOCOS = Path("blocos_pl")
 MAX_GRUPOS = 5
 
-MODELOS_LITE = ["gemini-2.5-flash-lite", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash"]
-MODELOS_FULL = ["gemini-2.5-flash-lite", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash"]
+MODELOS_LITE = ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite"]
+MODELOS_FULL = ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite", "gemini-flash-latest", "gemini-3.5-flash", "gemini-2.5-flash"]
 
 CHAVES = [k for k in [
     os.environ.get("GEMINI_KEY_LIVE_CONTENT_1_PL", ""),
@@ -335,7 +335,7 @@ ZASADY BEZWZGLĘDNE:
 - Od 2600 do 3000 słów
 """
 
-    modelos = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"] if so_full else MODELOS_FULL
+    modelos = MODELOS_FULL
     texto   = _chamar_gemini(prompt, modelos, max_tokens=8192)
     texto   = re.sub(r'\*+', '', texto)
     texto   = re.sub(r'#{1,6}\s+', '', texto)
