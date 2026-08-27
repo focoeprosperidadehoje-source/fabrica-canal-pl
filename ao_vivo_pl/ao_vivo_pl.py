@@ -1190,7 +1190,14 @@ def loop_transmissor():
                     _limpar_orfaos(yt)
                     bid_h = adotar_broadcast_ativo(yt)
                     if not bid_h:
-                        bid_h = criar_broadcast_permanente(yt)
+                        for _tentativa_bc in range(5):
+                            bid_h = criar_broadcast_permanente(yt)
+                            if bid_h:
+                                break
+                            log.warning(f"criar_broadcast PL: tentativa {_tentativa_bc+1}/5 falhou — aguardando 30s")
+                            _ev_parar.wait(timeout=30)
+                        if not bid_h:
+                            log.error("criar_broadcast PL: todas as 5 tentativas falharam — watchdog tentará a cada 2min")
                     else:
                         try:
                             r2 = yt.liveBroadcasts().list(part="snippet", id=bid_h).execute()
@@ -1201,10 +1208,11 @@ def loop_transmissor():
                                 log.info(f"Broadcast adotado em execução há {elapsed_adopted/3600:.1f}h — ajustando relógio do ciclo")
                         except Exception as _e:
                             log.warning(f"elapsed_adopted check: {_e}")
-                    with _lock:
-                        _estado["live_id_h"] = bid_h
-                    threading.Thread(target=_publicar_apos_golive, args=(yt, bid_h),
-                                     name="PublicaLivePL", daemon=True).start()
+                    if bid_h:
+                        with _lock:
+                            _estado["live_id_h"] = bid_h
+                        threading.Thread(target=_publicar_apos_golive, args=(yt, bid_h),
+                                         name="PublicaLivePL", daemon=True).start()
                 except Exception as e:
                     log.error(f"broadcast PL do ciclo: {e}")
 
@@ -1303,26 +1311,35 @@ def loop_transmissor():
                         rot_idx_h = (rot_idx_h + 1) % len(blocos)
                         log.info(f"Bloco PL appendado (manutenção): {h_next.name} ({buf_h - elapsed:.0f}s)")
 
-                    if yt and bid_h and (time.time() - ultimo_check_bc) >= 120:
+                    if yt and (time.time() - ultimo_check_bc) >= 120:
                         ultimo_check_bc = time.time()
-                        st = None
-                        for _tentativa in range(3):
-                            try:
-                                itens = yt.liveBroadcasts().list(part="status", id=bid_h).execute().get("items", [])
-                                st = itens[0].get("status", {}).get("lifeCycleStatus") if itens else None
-                                break
-                            except Exception as e:
-                                log.warning(f"watchdog broadcast PL (tentativa {_tentativa+1}/3): {e}")
-                                if _tentativa < 2:
-                                    time.sleep(10)
-                        if st in ("complete", "revoked"):
-                            log.warning(f"Broadcast PL {bid_h} encerrado — criando novo")
-                            _finalizar_broadcast(yt, bid_h)
+                        if not bid_h:
+                            log.warning("Watchdog PL: bid_h=None — tentando criar broadcast agora")
                             bid_h = criar_broadcast_permanente(yt)
-                            with _lock:
-                                _estado["live_id_h"] = bid_h
-                            threading.Thread(target=_publicar_apos_golive, args=(yt, bid_h),
-                                             name="PublicaLivePL", daemon=True).start()
+                            if bid_h:
+                                with _lock:
+                                    _estado["live_id_h"] = bid_h
+                                threading.Thread(target=_publicar_apos_golive, args=(yt, bid_h),
+                                                 name="PublicaLivePL", daemon=True).start()
+                        else:
+                            st = None
+                            for _tentativa in range(3):
+                                try:
+                                    itens = yt.liveBroadcasts().list(part="status", id=bid_h).execute().get("items", [])
+                                    st = itens[0].get("status", {}).get("lifeCycleStatus") if itens else None
+                                    break
+                                except Exception as e:
+                                    log.warning(f"watchdog broadcast PL (tentativa {_tentativa+1}/3): {e}")
+                                    if _tentativa < 2:
+                                        time.sleep(10)
+                            if st in ("complete", "revoked"):
+                                log.warning(f"Broadcast PL {bid_h} encerrado — criando novo")
+                                _finalizar_broadcast(yt, bid_h)
+                                bid_h = criar_broadcast_permanente(yt)
+                                with _lock:
+                                    _estado["live_id_h"] = bid_h
+                                threading.Thread(target=_publicar_apos_golive, args=(yt, bid_h),
+                                                 name="PublicaLivePL", daemon=True).start()
 
                     _ev_parar.wait(timeout=10)
             finally:
