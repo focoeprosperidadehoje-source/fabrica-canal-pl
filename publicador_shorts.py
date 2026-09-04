@@ -171,11 +171,12 @@ for index, linha in enumerate(dados, start=2):
                     if not ID_PLAYLIST_SHORTS_PL.startswith("PLACEHOLDER"):
                         youtube.playlistItems().insert(part="snippet", body={"snippet": {"playlistId": ID_PLAYLIST_SHORTS_PL, "resourceId": {"kind": "youtube#video", "videoId": video_id}}}).execute()
                 except Exception as e: print(f"Ostrzezenie: playlist: {e}")
-                aba_shorts.update_cell(index, col_status, 'Published')
+                try:
+                    aba_shorts.update_cell(index, col_status, 'Published')
+                except Exception as e: print(f"Ostrzezenie: planilha: {e}")
                 break
             except Exception as e:
                 print(f"Blad YouTube (Proba {tentativa+1}/3): {e}")
                 time.sleep(15)
-            break
 
 print("\nSerwer matrycy Shorts zakonczony.")

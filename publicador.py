@@ -338,11 +338,12 @@ for index, linha in enumerate(dados, start=2):
                     pid = ID_PLAYLIST_JESUS_MANHA if persona == 'JESUS' and "06:00" in horario_str else ID_PLAYLIST_MARIA_NOITE
                     if pid and not pid.startswith("PLACEHOLDER"): youtube.playlistItems().insert(part="snippet", body={"snippet": {"playlistId": pid, "resourceId": {"kind": "youtube#video", "videoId": video_id}}}).execute()
                 except Exception as e: print(f"Ostrzezenie: playlist: {e}")
-                aba_principal.update_cell(index, col_status, 'Published')
+                try:
+                    aba_principal.update_cell(index, col_status, 'Published')
+                except Exception as e: print(f"Ostrzezenie: planilha: {e}")
                 break
             except Exception as e:
                 print(f"Blad YouTube (Proba {tentativa+1}/3): {e}")
                 time.sleep(15)
-            break
 
 print("\nSerwer matrycy zakonczony.")

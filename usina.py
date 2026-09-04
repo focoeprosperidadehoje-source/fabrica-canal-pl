@@ -85,7 +85,6 @@ PILARES = {
     6: "Cuda i wdziecznosc"
 }
 GRADE_DIARIA = [
-    {"horario": "06:00", "personagem": "Jesus", "idioma": "PL", "foco": "Poranek: Konsekracja dnia, Boza madrosc i przewodnictwo na caly dzien.", "periodo": "tego ranka"},
     {"horario": "18:00", "personagem": "Maria", "idioma": "PL", "foco": "HYBRYDOWY: Pierwsza czesc dotyczy bolu Filaru Dnia, ostatnia czesc przechodzi do wieczornej modlitwy — gleboki sen, ulga od leku i nocna ochrona.", "periodo": "tego wieczoru"}
 ]
 
