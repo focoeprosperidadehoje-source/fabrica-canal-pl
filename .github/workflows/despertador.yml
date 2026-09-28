@@ -5,6 +5,9 @@ on:
     - cron: '30 0 * * *' # 02:30 Warsaw (winter) / 01:30 (summer)
     - cron: '30 1 * * *' # 03:30 Warsaw (winter) / 02:30 (summer)
     - cron: '30 2 * * *' # 04:30 Warsaw (winter) / 03:30 (summer)
+  push:
+    paths:
+      - '.github/workflows/despertador.yml'  # roda na hora sempre que este arquivo muda
   workflow_dispatch:
 
 jobs:
@@ -22,6 +25,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
           GOOGLE_CREDENTIALS_PL: ${{ secrets.GOOGLE_CREDENTIALS_PL }}
-        run: python usina.py
+        run: for i in 1 2 3 4 5 6; do python usina.py || echo "execucao $i falhou"; done
 
 # reindex
+# novenas 06h ativadas 2026-09-28

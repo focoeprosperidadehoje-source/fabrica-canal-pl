@@ -6,6 +6,9 @@ on:
     - cron: '30 4 * * *'  # 06:30 Warsaw (winter) -> backup
     - cron: '30 14 * * *' # 16:30 Warsaw (winter) -> publica as 18:00
     - cron: '30 15 * * *' # 17:30 Warsaw (winter) -> backup
+  workflow_run:  # renderiza logo depois de cada execução da usina
+    workflows: ["1. Usina Longos (PL)"]
+    types: [completed]
   workflow_dispatch:
 
 jobs:
@@ -17,6 +20,7 @@ jobs:
     strategy:
       matrix:
         horario:
+          - '06:00'
           - '18:00'
       fail-fast: false
 
