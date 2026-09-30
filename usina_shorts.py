@@ -105,7 +105,7 @@ Temat dnia: {pilar_do_dia}. Fokus: {foco_teologico}. Skierowany do: Matki Bozej 
 {contexto_eco}
 
 OBOWIAZKOWA STRUKTURA SKRYPTU (IDEALNY LOOP):
-1. HOOK (Poczatek): Pierwsza fraza. OBOWIAZKOWO zaczyna sie od malej litery z wielokropkiem. Jest SYNTAKTYCZNYM UZUPELNIENIEM zdania koncowego.
+1. HOOK (Poczatek): Pierwsza fraza. OBOWIAZKOWO zaczyna sie od malej litery z wielokropkiem. Jest SYNTAKTYCZNYM UZUPELNIENIEM zdania koncowego. ZASADA RETENCJI (obowiazkowa): w pierwszych 10 slowach zdanie poczatkowe mowi WPROST do bolu widza, w drugiej osobie i zgodnie z tematem dnia (np.: "...jesli ktos w twoim domu jest chory, ta modlitwa jest dla ciebie."). Zakaz zaczynania od powitania, kontekstu lub ogolnika — widz decyduje w 2 sekundy, czy zostaje.
 2. MODLITWA: Napisz DOKLADNIE te modlitwe: "{oracao_padrao}"
 3. ZDANIE LOOP (Koniec): Ostatnia fraza. OBOWIAZKOWO konczy sie wielokropkiem. MUSI byc SYNTAKTYCZNIE NIEKOMPLETNA.
 

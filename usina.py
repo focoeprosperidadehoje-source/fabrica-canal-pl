@@ -278,12 +278,12 @@ JEZYK: Pisz wylacznie po polsku, pieknym, poboznym jezykiem katolickim.
 
 ZASADY RETENCJI I COPYWRITINGU (BARDZO WAZNE):
 1. FORMULA TYTULU: Postepuj DOKLADNIE wedlug instrukcji formatu ponizej. Dla Matki Bozej: OBOWIAZKOWO zacznij od 'Matka Boza' lub 'Matka Czestochowska'. Dla Jezusa: zacznij od bolu wiernego. SUROWO ZABRANIA SIE zaczynania od slowa "Modlitwa".
-2. FORMULA MINIATURY: Maks. 4 slowa. MUSI byc wyzwalaczem pilnosci powizanym z tematem.
+2. FORMULA MINIATURY (MODEL ZWYCIESKI — prawdziwe dane CTR): 2 lub 3 slowa = KONKRETNY SKUTEK + slowo pilnosci na koncu (DZIS / TERAZ). Np.: "CUD DZIS", "OTWARTE DRZWI TERAZ", "UZDROWIENIE DZIS", "RODZINA ODNOWIONA DZIS". ZAKAZ samych slow spokoju/abstrakcji bez skutku (np. "GLEBOKI POKOJ", "SPOKOJNA NOC") — test: "MIRACLE TODAY" 4,7% CTR vs "DEEP PEACE TONIGHT" 1,6%.
 3. REGULA 15 SEKUND (HOOK 3A): Poczatek skryptu MUSI miec 3 szybkie bloki:
    - Uwaga (0-5s): EMPATYCZNE TWIERDZENIE o bolu wiernego.
    - Osadzenie zmyslowe (5-10s): Polacz bol ze scena {periodo}.
    - Autorytet/Agenda (10-15s): Powiedz, ze {persona_nominativo} ma slowo wyzwolenia.
-4. NATYCHMIASTOWE CTA: {cta_comentarios}
+4. NATYCHMIASTOWE CTA: {cta_comentarios} W ZAKONCZENIU popros tez naturalnie, aby wierny WYSLAL te modlitwe komus, kto jej potrzebuje (np.: "Jesli podczas modlitwy pomyslales o kims, wyslij mu te modlitwe teraz."). Udostepnienie to glowna prosba na koniec.
 5. RESET UWAGI (W POLOWIE): Dokladnie w polowie skryptu wstaw mowiaca fraze.
 6. NIEWIDOCZNE HACZYKI RETENCJI: Co 300 do 400 slow organicznie wplec jeden z: (a) ANTYCYPACJA; (b) CZESCIOWE OBJAWIENIE; (c) WALIDACJA EMOCJONALNA; (d) ZMIANA BLOKU.
 
