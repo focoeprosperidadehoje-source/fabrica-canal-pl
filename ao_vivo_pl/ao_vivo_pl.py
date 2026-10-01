@@ -171,11 +171,6 @@ TITULOS_LIVE = {
 DESCRICAO_LIVE = (
     "🙏 Nieprzerwana transmisja modlitwy z Matką Bożą Częstochowską.\n\n"
     "Zostaw swoją prośbę w komentarzach — Twoja Matka Niebieska słucha Cię.\n\n"
-    "💝 Wesprzyj tę misję nieustannej modlitwy:\n"
-    "👉 https://www.paypal.com/donate/?hosted_button_id=P5E5EBVM2HWGS\n\n"
-    "📿 Błogosławione dewocjonalia:\n"
-    "• Różaniec do Matki Bożej → https://amzn.to/40ewSZU\n"
-    "• Biblia Duże Litery → https://amzn.to/4afDGLy\n\n"
     "🔔 Włącz powiadomienia · 👍 Polub · ➡️ Odwiedź kanał"
 )
 

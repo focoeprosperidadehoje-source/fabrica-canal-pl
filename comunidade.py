@@ -113,7 +113,7 @@ if video_ids:
                 comentarios = youtube.commentThreads().list(part='snippet', videoId=v_id, maxResults=100).execute()
                 if not any(t['snippet']['topLevelComment']['snippet'].get('authorChannelId', {}).get('value') == MEU_CANAL_ID for t in comentarios.get('items', [])):
                     if "#shorts" in v_titulo.lower():
-                        comentario_final = f"{TEXTO_FIXO_PL}\n\nNiech ta krotka modlitwa blogoslawi Twoj dzien! Odwiedz nasz kanal po pelne modlitwy.\n\n🔴 NA ZYWO TERAZ 24/7: Twoje intencje sa nieustannie wznoszone w modlitwie. Dolacz: {LINK_LIVE}"
+                        comentario_final = f"{TEXTO_FIXO_PL}\n\nNiech ta krotka modlitwa blogoslawi Twoj dzien! Odwiedz nasz kanal po pelne modlitwy.\n\n🔴 NA ZYWO TERAZ 24/7: Twoje intencje sa nieustannie wznoszone w modlitwie. Dolacz do nas na zywo: zakladka Na zywo na naszym kanale."
                     else:
                         comentario_final = f"{TEXTO_FIXO_PL}\n\nKontynuuj modlitwe z nami w naszej transmisji 24/7: {LINK_LIVE}"
                     youtube.commentThreads().insert(part="snippet", body={"snippet": {"videoId": v_id, "topLevelComment": {"snippet": {"textOriginal": comentario_final}}}}).execute()
